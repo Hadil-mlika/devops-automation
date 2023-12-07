@@ -1,10 +1,7 @@
 package com.projectTBS.employeesmicroservice.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +19,24 @@ public class EmployeeInfo {
     private String password;
     private String role;
 
+
+    @ManyToOne
+    @JoinColumn(name = "department_id") // La colonne de jointure dans la table Employee
+    private Departement department;
+
+
+    @Override
+    public String toString() {
+        return "EmployeeInfo{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                // Ne pas inclure directement le département ici
+                '}';
+    }
 
 
 

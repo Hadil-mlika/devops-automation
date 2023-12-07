@@ -52,9 +52,11 @@ public class SecurityConfig {
         return http.csrf().disable()
                 .cors().and() // Ajoutez cette ligne pour activer la gestion de CORS
                 .authorizeHttpRequests()
-                .requestMatchers("/auth/login", "/auth/authenticate","api/employees/all").permitAll()
+                .requestMatchers("/auth/login",
+                        "/api/employees/add",
+                        "/auth/authenticate","/api/leave-requests/submit","api/employees/all").permitAll()
                 .and()
-                .authorizeHttpRequests().requestMatchers("/api/employees/**")
+                .authorizeHttpRequests().requestMatchers("/api/departments/**","/api/employees/**","/auth/info")
                 .authenticated().and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

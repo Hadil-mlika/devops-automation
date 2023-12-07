@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 public class EmployeeMapperImpl implements EmployeeMapper {
     @Override
     public EmployeeDTO mapEmployeeToEmployeeDTO(EmployeeInfo employee) {
+        if (employee == null) {
+
+            return null;
+        }
         EmployeeDTO dto = new EmployeeDTO();
         dto.setPassword(employee.getPassword());
         dto.setId(employee.getId());
@@ -16,6 +20,8 @@ public class EmployeeMapperImpl implements EmployeeMapper {
         dto.setLastName(employee.getLastName());
         dto.setRole(employee.getRole());
         dto.setEmail(employee.getEmail());
+
+        dto.setDepartmentId(employee.getDepartment() != null ? employee.getDepartment().getId() : null);
         return dto;
     }
 
@@ -28,6 +34,7 @@ public class EmployeeMapperImpl implements EmployeeMapper {
         employee.setRole(dto.getRole());
         employee.setEmail(dto.getEmail());
         employee.setPassword(dto.getPassword());
+
         return employee;
     }
 }

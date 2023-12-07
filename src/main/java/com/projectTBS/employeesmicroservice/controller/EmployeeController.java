@@ -17,7 +17,7 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    @PostMapping("add")
+    @PostMapping("/add")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public EmployeeDTO createEmployee(@RequestBody EmployeeDTO employeeDTO) {
         return employeeService.createEmployee(employeeDTO);

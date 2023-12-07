@@ -2,8 +2,10 @@ package com.projectTBS.employeesmicroservice.controller;
 
 import com.projectTBS.employeesmicroservice.dto.AuthRequest;
 import com.projectTBS.employeesmicroservice.dto.AuthResponse;
+import com.projectTBS.employeesmicroservice.dto.EmployeeDTO;
 import com.projectTBS.employeesmicroservice.models.AuthenticationResponse;
 import com.projectTBS.employeesmicroservice.models.LoginRequest;
+import com.projectTBS.employeesmicroservice.service.EmployeeService;
 import com.projectTBS.employeesmicroservice.service.Implementation.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,66 +37,61 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
+    @Autowired
+    private EmployeeService employeeService;
 
 
 
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            // Étape 1: Création de l'objet UsernamePasswordAuthenticationToken
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-            );
 
-            // Étape 2: Tentative d'authentification
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            System.out.println("Utilisateur authentifié: " + userDetails.getUsername());
-
-            // Étape 3: Mise à jour du contexte de sécurité
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            // Étape 4: Mise à jour du contexte de sécurité
-            UserDetails userDetailsAfterUpdate = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            System.out.println("Utilisateur après la mise à jour du contexte: " + userDetailsAfterUpdate.getUsername());
-
-            // Étape 5: Réponse à la requête
-
-            // Supposons que getAuthorities() retourne une collection d'objets GrantedAuthority
-            Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-
-            // Supposons que getAuthorities() retourne une seule chaîne avec des rôles séparés par des virgules
-            String rolesString = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.joining(","));
-
-            // Utilisez la chaîne directement comme votre rôle
-            String role = rolesString;
-
-            String email=userDetails.getUsername();
-
-            return ResponseEntity.ok(new AuthenticationResponse("Utilisateur authentifié",email, role));
-
-
-
-        } catch (AuthenticationException e) {
-            // Gestion des erreurs d'authentification
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Échec de l'authentification");
-        }
-    }
-
-
-
-
-//    @PostMapping("/authenticate")
-//    public String authenticationAndGetToken (@RequestBody AuthRequest authRequest){
-//        Authentication authentication =authenticationManager.authenticate((new UsernamePasswordAuthenticationToken(authRequest.getEmail(),authRequest.getPassword())));
-//        if (authentication.isAuthenticated()){
-//            return jwtService.generateToken(authRequest.getEmail());
-//        }else {
-//            throw new UsernameNotFoundException("invalid user request !!");
+//    @PostMapping("/login")
+//    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+//        try {
+//            // Étape 1: Création de l'objet UsernamePasswordAuthenticationToken
+//            Authentication authentication = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+//            );
+//
+//            // Étape 2: Tentative d'authentification
+//            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//            System.out.println("Utilisateur authentifié: " + userDetails.getUsername());
+//
+//            // Étape 3: Mise à jour du contexte de sécurité
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//            // Étape 4: Mise à jour du contexte de sécurité
+//            UserDetails userDetailsAfterUpdate = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//            System.out.println("Utilisateur après la mise à jour du contexte: " + userDetailsAfterUpdate.getUsername());
+//
+//            // Étape 5: Réponse à la requête
+//
+//            // Supposons que getAuthorities() retourne une collection d'objets GrantedAuthority
+//            Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+//
+//            // Supposons que getAuthorities() retourne une seule chaîne avec des rôles séparés par des virgules
+//            String rolesString = userDetails.getAuthorities().stream()
+//                    .map(GrantedAuthority::getAuthority)
+//                    .collect(Collectors.joining(","));
+//
+//            // Utilisez la chaîne directement comme votre rôle
+//            String role = rolesString;
+//
+//            String email=userDetails.getUsername();
+//
+//            return ResponseEntity.ok(new AuthenticationResponse("Utilisateur authentifié",email, role));
+//
+//
+//
+//        } catch (AuthenticationException e) {
+//            // Gestion des erreurs d'authentification
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Échec de l'authentification");
 //        }
 //    }
+
+
+
+
+
 
 
     @PostMapping("/authenticate")
@@ -106,8 +103,9 @@ public class AuthController {
 
             if (authentication.isAuthenticated()) {
                 String token = jwtService.generateToken(authRequest.getEmail());
+                String email =authRequest.getEmail();
 
-                return ResponseEntity.ok(new AuthResponse("Utilisateur authentifié", token));
+                return ResponseEntity.ok(new AuthResponse("Utilisateur authentifié", token,email));
 
             } else {
                 throw new UsernameNotFoundException("Invalid user request !!");
@@ -116,6 +114,20 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
+
+
+
+
+        @GetMapping("/info")
+        public ResponseEntity<EmployeeDTO> getUserInfo() {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+
+            String username = authentication.getName();
+            EmployeeDTO userInfo = employeeService.getUserInfoByUsername(username);
+
+            return ResponseEntity.ok(userInfo);
+        }
 
 
 
