@@ -18,4 +18,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+  websocket:
+    # Configuration spécifique WebSocket
+    servlet:
+      path: /ws
 #    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect

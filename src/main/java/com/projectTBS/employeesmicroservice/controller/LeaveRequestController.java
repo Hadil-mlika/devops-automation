@@ -2,18 +2,19 @@ package com.projectTBS.employeesmicroservice.controller;
 
 import com.projectTBS.employeesmicroservice.dto.LeaveRequestDto;
 import com.projectTBS.employeesmicroservice.dto.NotificationDTO;
-import com.projectTBS.employeesmicroservice.entity.LeaveRequest;
+
 import com.projectTBS.employeesmicroservice.service.Implementation.LeaveRequestService;
 import com.projectTBS.employeesmicroservice.service.Implementation.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/leave-requests")
+@Controller
 @CrossOrigin
 public class LeaveRequestController {
 
@@ -25,7 +26,9 @@ public class LeaveRequestController {
 
 
 
-    @PostMapping("/submit")
+
+    @MessageMapping("/app/leave-requests/submit")
+    @SendTo("/topic/leave-requests")
     public ResponseEntity<LeaveRequestDto> submitLeaveRequest(@RequestBody LeaveRequestDto leaveRequestDTO) {
         LeaveRequestDto submittedLeaveRequest = leaveRequestService.submitLeaveRequest(leaveRequestDTO);
 
